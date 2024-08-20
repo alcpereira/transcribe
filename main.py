@@ -16,10 +16,8 @@ def get_speakers(turn):
 
 def count_words(turn):
     """Counts the number of words in the turn."""
-    text = turn.text
-    if text is None:
-        return 0
-    return len(text.split())
+    text = [i for i in turn.itertext()]
+    return len(text)
 
 
 for file in files:
