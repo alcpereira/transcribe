@@ -16,7 +16,9 @@ def get_speakers(turn):
 
 def count_words(turn):
     """Counts the number of words in the turn."""
-    text = [i for i in turn.itertext()]
+    if "speaker" not in turn.attrib:
+        return 0
+    text = [i.strip() for i in turn.itertext() if i.strip()]
     return len(text)
 
 
