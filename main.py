@@ -22,36 +22,37 @@ def count_words(turn):
     return len(text)
 
 
-for file in files:
-    print("Parsing file", file)
-    with open(file, "r", encoding="ISO-8859-1") as f:
-        tree = ET.parse(f)
-        root = tree.getroot()
+if __name__ == "__main__":
+    for file in files:
+        print("Parsing file", file)
+        with open(file, "r", encoding="ISO-8859-1") as f:
+            tree = ET.parse(f)
+            root = tree.getroot()
 
-        speakers = collections.defaultdict(lambda: [0.0, 0, 0])  # [Total time, Number of turns, Total words]
+            speakers = collections.defaultdict(lambda: [0.0, 0, 0])  # [Total time, Number of turns, Total words]
 
-        episode = root.find("Episode")
-        if episode is None:
-            print("No Episode tag found")
-            continue
+            episode = root.find("Episode")
+            if episode is None:
+                print("No Episode tag found")
+                continue
 
-        sections = episode.findall("Section")
-        if sections is None:
-            print("No Section tag found")
-            continue
+            sections = episode.findall("Section")
+            if sections is None:
+                print("No Section tag found")
+                continue
 
-        for section in sections:
-            for turn in section.findall("Turn"):
-                time = float(turn.attrib["endTime"]) - float(turn.attrib["startTime"])
-                num_words = count_words(turn)
-                for speaker in get_speakers(turn):
-                    speakers[speaker][0] += time
-                    speakers[speaker][1] += 1
-                    speakers[speaker][2] += num_words
+            for section in sections:
+                for turn in section.findall("Turn"):
+                    time = float(turn.attrib["endTime"]) - float(turn.attrib["startTime"])
+                    num_words = count_words(turn)
+                    for speaker in get_speakers(turn):
+                        speakers[speaker][0] += time
+                        speakers[speaker][1] += 1
+                        speakers[speaker][2] += num_words
 
-        print(speakers)
-        # for child in section:
-        #     print(child.tag, child.attrib)
+            print(speakers)
+            # for child in section:
+            #     print(child.tag, child.attrib)
 
 
 # The goal
