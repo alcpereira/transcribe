@@ -6,6 +6,10 @@ import collections
 files = [f for f in os.listdir() if f.endswith(".trico") or f.endswith(".trs")]
 
 
+def get_speaks(turn):
+    return [i.strip() for i in turn.itertext() if i.strip()]
+
+
 def get_speakers(turn):
     """Returns a list of speakers in the turn, if no speaker is found, returns ["silence"]"""
     if "speaker" in turn.attrib:
@@ -14,17 +18,28 @@ def get_speakers(turn):
     return ["silence"]
 
 
+def get_speaker_words(speaks, speakers, speaker):
+    for i in range(0, len(speakers)):
+        spk = speakers[i]
+        if speaker == spk:
+            return speaks[i]
+        
+    return "test"
+
+
 def count_words(turn):
     """Counts the number of words in the turn."""
     if "speaker" not in turn.attrib:
         return 0
-    text = [i.strip() for i in turn.itertext() if i.strip()]
-    return len(text)
+    speaks = get_speaks(turn)
+    if len(speaks) == 0:
+        return 0
+    return len(speaks[0].split(' ')) # [0] is hardcode
 
 
 if __name__ == "__main__":
     for file in files:
-        print("Parsing file", file)
+        print("\nParsing file", file)
         with open(file, "r", encoding="ISO-8859-1") as f:
             tree = ET.parse(f)
             root = tree.getroot()
