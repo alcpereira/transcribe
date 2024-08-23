@@ -1,11 +1,15 @@
 import os
+import numpy as np
+import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
+
 
 # help = idk python fix it pls
 
 class Transcript:
-    def __init__(self, root: ET.Element):
+    def __init__(self, root: ET.Element, fileName: str):
         self.root = root
+        self.fileName = fileName
 
         self.find_all_speakers() # help
         # print(f"Total of speakers: {len(self.speakers)}")
@@ -23,7 +27,7 @@ class Speaker:
         self.id = id
 
         self.set_stats() # bad naming ik
-        print(self.stats)
+        # print(self.stats)
         
 
     def set_stats(self):
@@ -76,7 +80,7 @@ transcripts = [] # storing them
 class App:
     def __init__(self):
         for file in files:
-            print("\nParsing file", file)
+            # print("\nParsing file", file)
             with open("../" + file, "r", encoding="ISO-8859-1") as f: # ("../" + file) is a bit shit i guess
                 tree = ET.parse(f)
                 root = tree.getroot()
@@ -86,15 +90,23 @@ class App:
                     print("No Episode tag found")
                     continue
 
-                transcripts.append(Transcript(root))
+                transcripts.append(Transcript(root, file))
 
 
 if __name__ == "__main__":
     App() # initializer (you will say thats dumb)
 
 
-# idk if i should add anything else
-# i cant graph things
-# if need anything else pls lmk
+for transcript in transcripts:
+    speakerCount = len(transcript.speakers)
 
-# bb
+    x = np.arange(speakerCount) + 1
+    y = [stats[2] for stats in [speaker.stats for speaker in transcript.speakers]]
+
+    plt.plot(x, y, color= "green")
+    plt.xlabel('Speaker')
+    plt.ylabel('Word count')
+
+    plt.title(transcript.fileName)
+
+    plt.show()
