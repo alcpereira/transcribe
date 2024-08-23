@@ -18,11 +18,12 @@ class Transcript:
         self.speakers = []
         
         for speaker in self.root.find("Speakers").findall("Speaker"): # help
-            self.speakers.append(Speaker(self.root, speaker.attrib["id"]))
+            self.speakers.append(Speaker(self, self.root, speaker.attrib["id"]))
 
 
 class Speaker:
-    def __init__(self, root: ET.Element, name: str):
+    def __init__(self, transcript: Transcript, root: ET.Element, name: str):
+        self.transcript = transcript
         self.root = root
         self.name = name
 
@@ -58,28 +59,22 @@ class Speaker:
     def number_of_words_per_turn(self, turn: ET.Element, speakers: str):
         speaks = [i.strip() for i in turn.itertext() if i.strip()]
 
-        wordCount = 0
+        totalWordCount = 0
 
         index = speakers.split(' ').index(self.name)
         for i, speak in enumerate(speaks):
             if index == i:
 
-                # <Turn speaker="spk3 spk1" startTime="1080.287" endTime="1080.548">
-                # <Sync time="1080.287"/>
-                # <Who nb="1"/>
-                # Thierry
-                # <Who nb="2"/>
-                # hein
-                # </Turn>
-
-                # if turn.attrib["startTime"] == "1080.287":
-                #     print(f"Speaker: {self.name}, Speak: {speak}")
+                # 2015_AfriqueDuSud_Argentine.trico
+                if turn.attrib["startTime"] == "7128.472":
+                    print(f"Speaker: {self.name}, Speak Count: {len(speaks)}")
                 
-                wordCount += len(speak.split(' '))
-                # if len(speak.split(' ')) > 50 and len(speaks) > 1:
-                #     print(speak)
+                # The first 3 speaks belong to spk3
+                # The last one belong to spk2
 
-        return wordCount
+                totalWordCount += len(speak.split(' '))
+
+        return totalWordCount
     
     def calculate_words_per_minute(self):
         self.stats[3] = self.stats[2] / (self.stats[0] / 60) if self.stats[2] != 0 else 0 # ZeroDivisionError
@@ -113,16 +108,19 @@ if __name__ == "__main__":
     App() # initializer (you will say thats dumb)
 
 
-for transcript in transcripts:
-    speakerCount = len(transcript.speakers)
+# for transcript in transcripts:
+#     speakerCount = len(transcript.speakers)
 
-    x = np.arange(speakerCount) + 1
-    y = [stats[2] for stats in [speaker.stats for speaker in transcript.speakers]]
+#     x = np.arange(speakerCount) + 1
+#     y = [stats[2] for stats in [speaker.stats for speaker in transcript.speakers]] # 🛑 Graph is here
 
-    plt.plot(x, y, color= "green")
-    plt.xlabel('Speaker')
-    plt.ylabel('Word count')
+#     plt.plot(x, y, color= "green")
+#     plt.xlabel('Speaker')
+#     plt.ylabel('Word count')
 
-    plt.title(transcript.fileName)
+#     plt.title(transcript.fileName)
 
-    plt.show()
+#     plt.show()
+
+
+# TODO 🛑: Fix the Event tags
