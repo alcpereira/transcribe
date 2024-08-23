@@ -16,18 +16,17 @@ class Transcript:
 
     def find_all_speakers(self):
         self.speakers = []
-# for i, spk in enumerate(speakers):
-        for i, speaker in enumerate(self.root.find("Speakers").findall("Speaker")): # help
-            self.speakers.append(Speaker(self.root, i, speaker.attrib["id"]))
+        
+        for speaker in self.root.find("Speakers").findall("Speaker"): # help
+            self.speakers.append(Speaker(self.root, speaker.attrib["id"]))
 
 
 class Speaker:
-    def __init__(self, root: ET.Element, id: str, name: str):
+    def __init__(self, root: ET.Element, name: str):
         self.root = root
-        self.id = id
         self.name = name
 
-        self.set_stats() # bad naming ik
+        self.set_stats()
         # print(self.stats)
         
 
@@ -50,20 +49,35 @@ class Speaker:
 
                         self.stats[0] += delta
                         self.stats[1] += 1
-                        self.stats[2] += self.number_of_words_per_turn(turn, attrib["startTime"])
+                        self.stats[2] += self.number_of_words_per_turn(turn, attrib["speaker"])
 
                 self.calculate_words_per_minute()
 
                 # self.calculate_words_per_minute(self.stats[0], self.stats[2])
 
-    def number_of_words_per_turn(self, turn, t):
+    def number_of_words_per_turn(self, turn: ET.Element, speakers: str):
         speaks = [i.strip() for i in turn.itertext() if i.strip()]
 
         wordCount = 0
 
+        index = speakers.split(' ').index(self.name)
         for i, speak in enumerate(speaks):
-            if self.id == i:
+            if index == i:
+
+                # <Turn speaker="spk3 spk1" startTime="1080.287" endTime="1080.548">
+                # <Sync time="1080.287"/>
+                # <Who nb="1"/>
+                # Thierry
+                # <Who nb="2"/>
+                # hein
+                # </Turn>
+
+                # if turn.attrib["startTime"] == "1080.287":
+                #     print(f"Speaker: {self.name}, Speak: {speak}")
+                
                 wordCount += len(speak.split(' '))
+                # if len(speak.split(' ')) > 50 and len(speaks) > 1:
+                #     print(speak)
 
         return wordCount
     
