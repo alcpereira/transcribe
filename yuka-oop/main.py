@@ -16,15 +16,16 @@ class Transcript:
 
     def find_all_speakers(self):
         self.speakers = []
-
-        for speaker in self.root.find("Speakers").findall("Speaker"): # help
-            self.speakers.append(Speaker(self.root, speaker.attrib["id"]))
+# for i, spk in enumerate(speakers):
+        for i, speaker in enumerate(self.root.find("Speakers").findall("Speaker")): # help
+            self.speakers.append(Speaker(self.root, i, speaker.attrib["id"]))
 
 
 class Speaker:
-    def __init__(self, root: ET.Element, id: str):
+    def __init__(self, root: ET.Element, id: str, name: str):
         self.root = root
         self.id = id
+        self.name = name
 
         self.set_stats() # bad naming ik
         # print(self.stats)
@@ -44,24 +45,25 @@ class Speaker:
                     continue
 
                 for speaker in attrib["speaker"].split(' '):
-                    if speaker == self.id:
+                    if speaker == self.name:
                         delta = float(attrib["endTime"]) - float(attrib["startTime"])
 
                         self.stats[0] += delta
                         self.stats[1] += 1
-                        self.stats[2] += self.number_of_words_per_turn(turn)
+                        self.stats[2] += self.number_of_words_per_turn(turn, attrib["startTime"])
 
                 self.calculate_words_per_minute()
 
                 # self.calculate_words_per_minute(self.stats[0], self.stats[2])
 
-    def number_of_words_per_turn(self, turn):
+    def number_of_words_per_turn(self, turn, t):
         speaks = [i.strip() for i in turn.itertext() if i.strip()]
 
         wordCount = 0
 
-        for speak in speaks:
-            wordCount += len(speak.split(' '))
+        for i, speak in enumerate(speaks):
+            if self.id == i:
+                wordCount += len(speak.split(' '))
 
         return wordCount
     
