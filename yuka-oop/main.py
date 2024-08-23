@@ -1,17 +1,14 @@
 import os
-# import collections
 import xml.etree.ElementTree as ET
 
-
 # help = idk python fix it pls
-
 
 class Transcript:
     def __init__(self, root: ET.Element):
         self.root = root
 
         self.find_all_speakers() # help
-        # print(len(self.speakers))
+        # print(f"Total of speakers: {len(self.speakers)}")
 
     def find_all_speakers(self):
         self.speakers = []
@@ -25,20 +22,12 @@ class Speaker:
         self.root = root
         self.id = id
 
-        self.numberOfTurns = 0
-        self.totalTime = 0
-        self.words = []
-
-        self.set_infos() # bad naming ik
+        self.set_stats() # bad naming ik
+        print(self.stats)
         
-        # print(self.numberOfTurns)
-        # print(self.totalTime)
-        # print(len(self.words))
-        
-        # speakers = collections.defaultdict(lambda: [0.0, 0, 0])  # [Total time, Number of turns, Total words]
 
-    def set_infos(self):
-        """Counts the number of words in the turn."""
+    def set_stats(self):
+        self.stats = [0.0, 0, 0, 0]  # [Total time (s), Number of turns, Total words, Words per minute]
 
         episode = self.root.find("Episode")
         sections = episode.findall("Section")
@@ -54,19 +43,29 @@ class Speaker:
                     if speaker == self.id:
                         delta = float(attrib["endTime"]) - float(attrib["startTime"])
 
-                        self.totalTime += delta
-                        self.numberOfTurns += 1
-                        self.get_words(turn)
+                        self.stats[0] += delta
+                        self.stats[1] += 1
+                        self.stats[2] += self.number_of_words_per_turn(turn)
 
-    def get_words(self, turn):
+                self.calculate_words_per_minute()
+
+                # self.calculate_words_per_minute(self.stats[0], self.stats[2])
+
+    def number_of_words_per_turn(self, turn):
         speaks = [i.strip() for i in turn.itertext() if i.strip()]
 
-        if len(speaks) != 0: # does it work in py ?? (help)
-            return
+        wordCount = 0
 
         for speak in speaks:
-            for word in speak.split(' '):
-                self.words.append(word)
+            wordCount += len(speak.split(' '))
+
+        return wordCount
+    
+    def calculate_words_per_minute(self):
+        self.stats[3] = self.stats[2] / (self.stats[0] / 60) if self.stats[2] != 0 else 0 # ZeroDivisionError
+    
+    # def calculate_words_per_minute(self, totaltime, words):
+    #     self.stats[3] = words / (totaltime / 60) if words != 0 else 0 # ZeroDivisionError
 
 
 files = [f for f in os.listdir("..") if f.endswith(".trico") or f.endswith(".trs")]
@@ -87,15 +86,11 @@ class App:
                     print("No Episode tag found")
                     continue
 
-                # sections = episode.findall("Section")
-                # if sections is None:
-                #     print("No Section tag found")
-                #     continue
-
-                transcripts.append(Transcript(root)) # , sections or not ??
+                transcripts.append(Transcript(root))
 
 
-App() # initializer (you will say thats dumb)
+if __name__ == "__main__":
+    App() # initializer (you will say thats dumb)
 
 
 # idk if i should add anything else
