@@ -23,7 +23,7 @@ def get_speaker_words(speaks, speakers, speaker):
         spk = speakers[i]
         if speaker == spk:
             return speaks[i]
-        
+
     return "test"
 
 
@@ -34,7 +34,7 @@ def count_words(turn):
     speaks = get_speaks(turn)
     if len(speaks) == 0:
         return 0
-    return len(speaks[0].split(' ')) # [0] is hardcode
+    return len(speaks[0].split(" "))  # [0] is hardcode
 
 
 if __name__ == "__main__":
@@ -68,12 +68,3 @@ if __name__ == "__main__":
             print(speakers)
             # for child in section:
             #     print(child.tag, child.attrib)
-
-
-# The goal
-# For each file separately
-# Total time per speaker (including "silence") ✅
-# Number of time a speaker speaks ✅
-# Number of words per speaker (total) - Make it a function because this will be a bit changed later - Not working with the Who part
-# Bonus: Words/minute
-# Visualization of the data
