@@ -1,64 +1,200 @@
 import main
 import xml.etree.ElementTree as ET
+import pytest
 
 
-def test_get_speakers_single():
-    trs_file = """
-    <Turn speaker="spk1" startTime="33.121" endTime="36.835">
-    <Sync time="33.121"/>
-    Test test
-    </Turn>"""
-    turn = ET.fromstring(trs_file)
-    assert main.get_speakers(turn) == ["spk1"]
+def test_speaker():
+    speaker = main.Speaker("1", "John")
+    assert speaker.id == "1"
+    assert speaker.name == "John"
+    assert speaker.interventions == []
 
 
-def test_get_speakers_multiple():
-    trs_file = """
-    <Turn speaker="spk3 spk1" startTime="33.121" endTime="36.835">
-    <Sync time="33.121"/>
-    Test test
-    </Turn>"""
-    turn = ET.fromstring(trs_file)
-    assert main.get_speakers(turn) == ["spk3", "spk1"]
+def test_speaker_add_intervention():
+    speaker = main.Speaker("1", "John")
+    speaker.add_intervention(num_words=10, duration_ms=1000)
+    assert len(speaker.interventions) == 1
+    assert speaker.interventions[0].num_words == 10
+    assert speaker.interventions[0].duration_ms == 1000
 
 
-def test_get_speakers_no_speaker():
-    trs_file = """
-    <Turn startTime="33.121" endTime="36.835">
-    <Sync time="33.121"/>
-    Test test
-    </Turn>"""
-    turn = ET.fromstring(trs_file)
-    assert main.get_speakers(turn) == ["silence"]
+def test_speaker_get_total_words():
+    speaker = main.Speaker("1", "John")
+    speaker.add_intervention(num_words=10, duration_ms=1000)
+    speaker.add_intervention(num_words=20, duration_ms=2000)
+    assert speaker.get_total_words() == 30
 
 
-def test_count_words_multiple_words():
-    trs_file = """
-    <Turn speaker="spk1" startTime="33.121" endTime="36.835">
-    <Sync time="33.121"/>
-    Test test
-    </Turn>"""
-    turn = ET.fromstring(trs_file)
-    assert main.count_words(turn) == 2
+def test_speaker_get_total_duration():
+    speaker = main.Speaker("1", "John")
+    speaker.add_intervention(num_words=10, duration_ms=1000)
+    speaker.add_intervention(num_words=20, duration_ms=2000)
+    assert speaker.get_total_duration() == 3000
 
 
-def test_count_words_multiple_speakers():
-    trs_file = """
-    <Turn speaker="spk1 spk2" startTime="171.469" endTime="172.067">
-    <Sync time="171.469"/>
-    <Who nb="1"/>
-    Test test 
-    <Who nb="2"/>
-    Test test test
-    </Turn>"""
-    turn = ET.fromstring(trs_file)
+def test_speaker_get_words_per_minute():
+    speaker = main.Speaker("1", "John")
+    speaker.add_intervention(num_words=10, duration_ms=30000)
+    assert speaker.get_words_per_minute() == 20
 
-    speakers = main.get_speakers(turn)
-    speaks = main.get_speaks(turn)
 
-    for speaker in speakers:
-        speaker_words = main.get_speaker_words(speaks, speakers, speaker)
-        assert speaker_words == "Test test" or speaker_words == "Test test test"
-        
+def test_intervention():
+    intervention = main.Intervention(10, 1000)
+    assert intervention.num_words == 10
+    assert intervention.duration_ms == 1000
 
-test_count_words_multiple_speakers()
+
+@pytest.fixture
+def transcript_one_speaker():
+    xml = """
+<Trans>
+  <Speakers>
+    <Speaker id="spk1" name="Speaker 1" />
+  </Speakers>
+  <Episode>
+    <Section>
+      <Turn speaker="spk1" startTime="0" endTime="30.000">
+        <Sync time="0" />
+        One two three four five.
+      </Turn>
+    </Section>
+  </Episode>
+</Trans>
+"""
+    return ET.fromstring(xml)
+
+
+@pytest.fixture
+def transcript_two_speakers():
+    xml = """
+<Trans>
+  <Speakers>
+    <Speaker id="spk1" name="Speaker 1" />
+    <Speaker id="spk2" name="Speaker 2" />
+  </Speakers>
+  <Episode>
+    <Section>
+      <Turn speaker="spk1" startTime="0" endTime="30.000">
+        <Sync time="0" />
+        One two three four five.
+      </Turn>
+    </Section>
+  </Episode>
+</Trans>
+"""
+    return ET.fromstring(xml)
+
+
+@pytest.fixture
+def transcript_no_speakers():
+    xml = """
+<Trans>
+  <Episode>
+    <Section>
+    </Section>
+  </Episode>
+</Trans>
+"""
+    return ET.fromstring(xml)
+
+
+@pytest.fixture
+def transcript_no_episode():
+    xml = """
+<Trans>
+    <Speakers />
+</Trans>
+"""
+    return ET.fromstring(xml)
+
+
+@pytest.fixture
+def transcript_silence():
+    xml = """
+<Trans>
+    <Speakers>
+        <Speaker id="spk1" name="Speaker 1" />
+    </Speakers>
+    <Episode>
+        <Section>
+            <Turn startTime="10.000" endTime="20.000">
+                <Sync time="10.000" />
+              </Turn>
+        </Section>
+    </Episode>
+</Trans>
+"""
+    return ET.fromstring(xml)
+
+
+def test_transcript_one_speaker(transcript_one_speaker):
+    transcript = main.Transcript(transcript_one_speaker, "test.xml")
+    assert len(transcript.speakers) == 1
+    assert "spk1" in transcript.speakers
+    speaker_one = transcript.speakers["spk1"]
+    assert speaker_one.name == "Speaker 1"
+    assert speaker_one.id == "spk1"
+
+
+def test_transcript_two_speakers(transcript_two_speakers):
+    transcript = main.Transcript(transcript_two_speakers, "test.xml")
+    assert len(transcript.speakers) == 2
+    assert "spk2" in transcript.speakers
+    speaker_two = transcript.speakers["spk2"]
+    assert speaker_two.name == "Speaker 2"
+    assert speaker_two.id == "spk2"
+
+
+# def test_transcript_string_representation(transcript_two_speakers):
+#     transcript = main.Transcript(transcript_two_speakers, "test.xml")
+#     assert (
+#         str(transcript)
+#         == """***
+# Transcript: test.xml with 2 speakers
+# """
+#     )
+
+
+def test_transcript_no_speaker(transcript_no_speakers, capsys):
+    transcript = main.Transcript(transcript_no_speakers, "test.xml")
+    assert len(transcript.speakers) == 0
+    assert "No Speakers tag found\n" == capsys.readouterr().out
+
+
+def test_transcript_no_episode(transcript_no_episode, capsys):
+    transcript = main.Transcript(transcript_no_episode, "test.xml")
+    transcript.parse_transcript()
+    assert "No Episode tag found\n" == capsys.readouterr().out
+
+
+def test_transcript_silence_duration(transcript_silence):
+    transcript = main.Transcript(transcript_silence, "test.xml")
+    transcript.parse_transcript()
+    assert transcript.silence.get_total_duration() == 10000
+
+
+def test_clean_duration():
+    assert main.clean_duration("10.000") == 10000
+    assert main.clean_duration("10.00") == 10000
+    assert main.clean_duration("10.0") == 10000
+    assert main.clean_duration("10.") == 10000
+    assert main.clean_duration("10") == 10000
+    assert main.clean_duration("10.5") == 10500
+
+
+def test_transcript_parsing_one_speaker(transcript_one_speaker):
+    transcript = main.Transcript(transcript_one_speaker, "test.xml")
+    transcript.parse_transcript()
+    speaker_one = transcript.speakers["spk1"]
+    assert speaker_one.get_total_duration() == 30000
+    assert speaker_one.get_total_words() == 5
+    assert speaker_one.get_words_per_minute() == 10
+
+
+def test_transcript_parsing_two_speakers(transcript_two_speakers):
+    transcript = main.Transcript(transcript_two_speakers, "test.xml")
+    transcript.parse_transcript()
+    speaker_two = transcript.speakers["spk2"]
+    assert speaker_two.get_total_duration() == 0
+    assert speaker_two.get_total_words() == 0
+    assert speaker_two.get_words_per_minute() == 0
