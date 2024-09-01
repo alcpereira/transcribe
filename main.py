@@ -2,6 +2,10 @@ import os
 import xml.etree.ElementTree as ET
 from typing import Dict, List
 from dataclasses import dataclass
+import re
+
+REGEX_WHO = re.compile(r'<Who nb="(\d)+"\s?\/>(.*)', re.DOTALL)
+ENCODING = "ISO-8859-1"
 
 
 class Transcript:
@@ -46,15 +50,32 @@ class Transcript:
             self.silence.add_intervention(num_words=0, duration_ms=duration)
             return
 
+        duration = clean_duration(turn.attrib["endTime"]) - clean_duration(turn.attrib["startTime"])
         speakers_list = speaker_attribute["speaker"].split(" ")
 
-        for speaker_id in speakers_list:
-            duration = clean_duration(turn.attrib["endTime"]) - clean_duration(turn.attrib["startTime"])
-            phrases = [i.strip() for i in turn.itertext() if i.strip()]
-            num_words = 0
-            for phrase in phrases:
-                num_words += len(phrase.split(" "))
+        if len(speakers_list) == 1:
+            speaker_id = speakers_list[0]
+            num_words = len("".join(turn.itertext()).strip().split(" "))
             self.speakers[speaker_id].add_intervention(num_words=num_words, duration_ms=duration)
+        else:
+            pass
+            words_holder = [
+                {
+                    "words": 0,
+                    "speaker_id": i,
+                }
+                for i in speakers_list
+            ]
+            for who in turn.findall("Who"):
+                byte_string = ET.tostring(who).decode(ENCODING)
+                match = REGEX_WHO.match(byte_string)
+                if match is None:
+                    raise ValueError("Failed regex")
+                [speaker_number, text] = match.groups()
+                speaker_number = int(speaker_number) - 1
+                words_holder[speaker_number]["words"] += len(text.strip().split(" "))
+            for words in words_holder:
+                self.speakers[words["speaker_id"]].add_intervention(num_words=words["words"], duration_ms=duration)
 
     def parse_transcript(self):
         episode = self.root.find("Episode")
@@ -87,6 +108,9 @@ class Speaker:
             return 0
         return self.get_total_words() / (self.get_total_duration() / 60000)
 
+    def get_interventions_number(self):
+        return len(self.interventions)
+
 
 @dataclass
 class Intervention:
@@ -104,7 +128,7 @@ if __name__ == "__main__":
 
     # transcripts = []
     for file in files:
-        with open(os.path.join(data_folder, file), "r", encoding="ISO-8859-1") as f:
+        with open(os.path.join(data_folder, file), "r", encoding=ENCODING) as f:
             tree = ET.parse(f)
             root = tree.getroot()
             transcript = Transcript(root, file)

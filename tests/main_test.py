@@ -127,6 +127,30 @@ def transcript_silence():
     return ET.fromstring(xml)
 
 
+@pytest.fixture
+def transcript_multiple_speaker():
+    xml = """
+<Trans>
+    <Speakers>
+        <Speaker id="spk1" name="Speaker 1" />
+        <Speaker id="spk2" name="Speaker 2" />
+    </Speakers>
+    <Episode>
+        <Section>
+            <Turn speaker="spk2 spk1" startTime="10.000" endTime="20.000">
+                <Sync time="10.000" />
+                <Who nb="1" />One two three four five.
+                <Who nb="2" />One two three.
+
+                <Who nb="1"/>Six seven eight nine ten.
+              </Turn>
+        </Section>
+    </Episode>
+</Trans>
+"""
+    return ET.fromstring(xml)
+
+
 def test_transcript_one_speaker(transcript_one_speaker):
     transcript = main.Transcript(transcript_one_speaker, "test.xml")
     assert len(transcript.speakers) == 1
@@ -189,6 +213,7 @@ def test_transcript_parsing_one_speaker(transcript_one_speaker):
     assert speaker_one.get_total_duration() == 30000
     assert speaker_one.get_total_words() == 5
     assert speaker_one.get_words_per_minute() == 10
+    assert speaker_one.get_interventions_number() == 1
 
 
 def test_transcript_parsing_two_speakers(transcript_two_speakers):
@@ -198,3 +223,17 @@ def test_transcript_parsing_two_speakers(transcript_two_speakers):
     assert speaker_two.get_total_duration() == 0
     assert speaker_two.get_total_words() == 0
     assert speaker_two.get_words_per_minute() == 0
+    assert speaker_two.get_interventions_number() == 0
+
+
+def test_transcript_parsing_multiple(transcript_multiple_speaker):
+    transcript = main.Transcript(transcript_multiple_speaker, "test.xml")
+    transcript.parse_transcript()
+    speaker_one = transcript.speakers["spk1"]
+    speaker_two = transcript.speakers["spk2"]
+    assert speaker_one.get_total_duration() == 10000
+    assert speaker_one.get_total_words() == 3
+    assert speaker_one.get_interventions_number() == 1
+    assert speaker_two.get_total_duration() == 10000
+    assert speaker_two.get_total_words() == 10
+    assert speaker_two.get_interventions_number() == 1
