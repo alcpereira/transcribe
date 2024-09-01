@@ -13,16 +13,18 @@ class Transcript:
         self.silence = Speaker("silence", "Silence")
 
     def __repr__(self):
-        decoration = "*" * 3 + "\n"
+        decoration = "*" * 10 + "\n"
+        speaker_decoration = "-" * 5 + "\n"
         output = decoration
         output += f"Transcript: {self.filename}\n"
         output += f"Speakers: {len(self.speakers)} speakers\n"
+        output += speaker_decoration
         for speaker in self.speakers.values():
-            output += f"{speaker.name} ({speaker.id})\n"
-            output += f"Total duration: {speaker.get_total_duration() / 1000} seconds\n"
+            output += f"{speaker.name} ({speaker.id}) - {len(speaker.interventions)} interventions\n"
+            output += f"Total duration: {(speaker.get_total_duration() / 1000):.2f} seconds\n"
             output += f"Total words: {speaker.get_total_words()}\n"
-            output += f"Words per minute: {speaker.get_words_per_minute()}\n"
-            output += decoration
+            output += f"Words per minute: {speaker.get_words_per_minute():.2f}\n"
+            output += speaker_decoration
         output += f"Silence: {len(self.silence.interventions)} interventions"
         output += f" pour une durée de {self.silence.get_total_duration() / 1000} secondes\n"
         output += decoration
