@@ -15,6 +15,8 @@ class Transcript:
         self.speakers: Dict[str, Speaker] = {}
         self.__add_all_speakers()
         self.silence = Speaker("silence", "Silence")
+        self.start = 0.0
+        self.end = 0.0
 
     def __repr__(self):
         decoration = "*" * 10 + "\n"
@@ -30,7 +32,8 @@ class Transcript:
             output += f"Words per minute: {speaker.get_words_per_minute():.2f}\n"
             output += speaker_decoration
         output += f"Silence: {len(self.silence.interventions)} interventions"
-        output += f" pour une durée de {self.silence.get_total_duration() / 1000} secondes\n"
+        output += f" total duration: {self.silence.get_total_duration() / 1000} seconds\n"
+        output += f"Total transcript duration: {(self.get_total_transcript_duration()):.2f} seconds\n"
         output += decoration
         return output
 
@@ -77,12 +80,19 @@ class Transcript:
             for words in words_holder:
                 self.speakers[words["speaker_id"]].add_intervention(num_words=words["words"], duration_ms=duration)
 
+    def get_total_transcript_duration(self):
+        return self.end - self.start
+
     def parse_transcript(self):
         episode = self.root.find("Episode")
         if episode is None:
             print("No Episode tag found")
             return
         for section in episode.findall("Section"):
+            if float(section.attrib["endTime"]) > self.end:
+                print("Setting end time", float(section.attrib["endTime"]))
+                self.end = float(section.attrib["endTime"])
+
             for turn in section.findall("Turn"):
                 self.__parse_turn(turn)
         pass
@@ -126,14 +136,11 @@ if __name__ == "__main__":
     data_folder = os.path.join(os.path.dirname(__file__), "data")
     files = [f for f in os.listdir(data_folder) if f.endswith(".trico") or f.endswith(".trs")]
 
-    # transcripts = []
     for file in files:
         with open(os.path.join(data_folder, file), "r", encoding=ENCODING) as f:
             tree = ET.parse(f)
             root = tree.getroot()
             transcript = Transcript(root, file)
             transcript.parse_transcript()
-            print(transcript)
-            # transcripts.append(Transcript(root, file))
 
-    # print(transcripts)
+            print(transcript)
