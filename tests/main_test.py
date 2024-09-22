@@ -12,7 +12,7 @@ def test_speaker():
 
 def test_speaker_add_intervention():
     speaker = main.Speaker("1", "John")
-    speaker.add_intervention(num_words=10, duration_ms=1000)
+    speaker.add_intervention(num_words=10, start_time_ms=1000, end_time_ms=2000)
     assert len(speaker.interventions) == 1
     assert speaker.interventions[0].num_words == 10
     assert speaker.interventions[0].duration_ms == 1000
@@ -20,26 +20,26 @@ def test_speaker_add_intervention():
 
 def test_speaker_get_total_words():
     speaker = main.Speaker("1", "John")
-    speaker.add_intervention(num_words=10, duration_ms=1000)
-    speaker.add_intervention(num_words=20, duration_ms=2000)
+    speaker.add_intervention(num_words=10, start_time_ms=1000, end_time_ms=2000)
+    speaker.add_intervention(num_words=20, start_time_ms=2000, end_time_ms=3000)
     assert speaker.get_total_words() == 30
 
 
 def test_speaker_get_total_duration():
     speaker = main.Speaker("1", "John")
-    speaker.add_intervention(num_words=10, duration_ms=1000)
-    speaker.add_intervention(num_words=20, duration_ms=2000)
+    speaker.add_intervention(num_words=10, start_time_ms=1000, end_time_ms=2000)
+    speaker.add_intervention(num_words=20, start_time_ms=3000, end_time_ms=5000)
     assert speaker.get_total_duration() == 3000
 
 
 def test_speaker_get_words_per_minute():
     speaker = main.Speaker("1", "John")
-    speaker.add_intervention(num_words=10, duration_ms=30000)
+    speaker.add_intervention(num_words=10, start_time_ms=0, end_time_ms=30000)
     assert speaker.get_words_per_minute() == 20
 
 
 def test_intervention():
-    intervention = main.Intervention(10, 1000)
+    intervention = main.Intervention(num_words=10, start_time_ms=1000, end_time_ms=2000)
     assert intervention.num_words == 10
     assert intervention.duration_ms == 1000
 
@@ -52,7 +52,7 @@ def transcript_one_speaker():
     <Speaker id="spk1" name="Speaker 1" />
   </Speakers>
   <Episode>
-    <Section>
+    <Section startTime="0" endTime="30.000">
       <Turn speaker="spk1" startTime="0" endTime="30.000">
         <Sync time="0" />
         One two three four five.
@@ -73,7 +73,7 @@ def transcript_two_speakers():
     <Speaker id="spk2" name="Speaker 2" />
   </Speakers>
   <Episode>
-    <Section>
+    <Section startTime="0" endTime="30.000">
       <Turn speaker="spk1" startTime="0" endTime="30.000">
         <Sync time="0" />
         One two three four five.
@@ -90,7 +90,7 @@ def transcript_no_speakers():
     xml = """
 <Trans>
   <Episode>
-    <Section>
+    <Section startTime="0" endTime="0">
     </Section>
   </Episode>
 </Trans>
@@ -116,7 +116,7 @@ def transcript_silence():
         <Speaker id="spk1" name="Speaker 1" />
     </Speakers>
     <Episode>
-        <Section>
+        <Section startTime="10.000" endTime="20.000">
             <Turn startTime="10.000" endTime="20.000">
                 <Sync time="10.000" />
               </Turn>
@@ -136,7 +136,7 @@ def transcript_multiple_speaker():
         <Speaker id="spk2" name="Speaker 2" />
     </Speakers>
     <Episode>
-        <Section>
+        <Section startTime="10.000" endTime="20.000">
             <Turn speaker="spk2 spk1" startTime="10.000" endTime="20.000">
                 <Sync time="10.000" />
                 <Who nb="1" />One two three four five.

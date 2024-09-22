@@ -1,8 +1,15 @@
 import os
+import math
 import xml.etree.ElementTree as ET
 from typing import Dict, List
 from dataclasses import dataclass
 import re
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter, MultipleLocator
+import numpy as np
+import seaborn as sns
+import datetime
+
 
 REGEX_WHO = re.compile(r'<Who nb="(\d)+"\s?\/>(.*)', re.DOTALL)
 ENCODING = "ISO-8859-1"
@@ -18,7 +25,7 @@ class Transcript:
         self.start = 0.0
         self.end = 0.0
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         decoration = "*" * 10 + "\n"
         speaker_decoration = "-" * 5 + "\n"
         output = decoration
@@ -43,23 +50,30 @@ class Transcript:
             print("No Speakers tag found")
             return
         for speaker in speakers_tag.findall("Speaker"):
-            self.speakers[speaker.attrib["id"]] = Speaker(speaker.attrib["id"], speaker.attrib["name"])
+            speaker_name = clean_speaker_name(speaker.attrib["name"], speaker.attrib["id"])
+            self.speakers[speaker.attrib["id"]] = Speaker(speaker.attrib["id"], speaker_name)
 
     def __parse_turn(self, turn: ET.Element) -> None:
         speaker_attribute = turn.attrib
 
         if "speaker" not in speaker_attribute:
-            duration = clean_duration(turn.attrib["endTime"]) - clean_duration(turn.attrib["startTime"])
-            self.silence.add_intervention(num_words=0, duration_ms=duration)
+            self.silence.add_intervention(
+                num_words=0,
+                start_time_ms=clean_duration(turn.attrib["startTime"]),
+                end_time_ms=clean_duration(turn.attrib["endTime"]),
+            )
             return
 
-        duration = clean_duration(turn.attrib["endTime"]) - clean_duration(turn.attrib["startTime"])
         speakers_list = speaker_attribute["speaker"].split(" ")
 
         if len(speakers_list) == 1:
             speaker_id = speakers_list[0]
             num_words = len("".join(turn.itertext()).strip().split(" "))
-            self.speakers[speaker_id].add_intervention(num_words=num_words, duration_ms=duration)
+            self.speakers[speaker_id].add_intervention(
+                num_words=num_words,
+                start_time_ms=clean_duration(turn.attrib["startTime"]),
+                end_time_ms=clean_duration(turn.attrib["endTime"]),
+            )
         else:
             pass
             words_holder = [
@@ -78,7 +92,11 @@ class Transcript:
                 speaker_number = int(speaker_number) - 1
                 words_holder[speaker_number]["words"] += len(text.strip().split(" "))
             for words in words_holder:
-                self.speakers[words["speaker_id"]].add_intervention(num_words=words["words"], duration_ms=duration)
+                self.speakers[words["speaker_id"]].add_intervention(
+                    num_words=words["words"],
+                    start_time_ms=clean_duration(turn.attrib["startTime"]),
+                    end_time_ms=clean_duration(turn.attrib["endTime"]),
+                )
 
     def get_total_transcript_duration(self):
         return self.end - self.start
@@ -90,7 +108,6 @@ class Transcript:
             return
         for section in episode.findall("Section"):
             if float(section.attrib["endTime"]) > self.end:
-                print("Setting end time", float(section.attrib["endTime"]))
                 self.end = float(section.attrib["endTime"])
 
             for turn in section.findall("Turn"):
@@ -104,10 +121,11 @@ class Speaker:
         self.name = name
         self.interventions: List[Intervention] = []
 
-    def add_intervention(self, num_words, duration_ms):
-        self.interventions.append(Intervention(num_words, duration_ms))
+    def add_intervention(self, num_words, start_time_ms, end_time_ms):
+        self.interventions.append(Intervention(num_words, start_time_ms, end_time_ms))
 
     def get_total_duration(self):
+        """Return the total duration of all interventions in milliseconds"""
         return sum([intervention.duration_ms for intervention in self.interventions])
 
     def get_total_words(self):
@@ -125,11 +143,75 @@ class Speaker:
 @dataclass
 class Intervention:
     num_words: int
-    duration_ms: int
+    start_time_ms: float
+    end_time_ms: float
+
+    @property
+    def duration_ms(self) -> int:
+        return int(self.end_time_ms - self.start_time_ms)
 
 
 def clean_duration(duration: str) -> int:
     return int(float(duration) * 1000)
+
+
+def clean_speaker_name(name: str, id: str) -> str:
+    if name == "" or "???" in name:
+        return id.replace("spk", "speaker#")
+    return name
+
+
+def draw_pie_chart(transcript: Transcript) -> None: # pragma: no cover
+    labels = ["Silence"]
+    sizes = [transcript.silence.get_total_duration()]
+    for speaker in transcript.speakers.values():
+        if speaker.get_total_duration() < 100:
+            continue
+        labels.append(speaker.name)
+        sizes.append(speaker.get_total_duration())
+    _, ax1 = plt.subplots()
+    ax1.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=90, colors=sns.color_palette("pastel"))
+    ax1.axis("equal")
+    plt.title(f"Duration of {transcript.filename}")
+    plt.show()
+
+
+def draw_speakers_timeline_chart(transcript: Transcript) -> None: # pragma: no cover
+    dt = 1
+    t = np.arange(0.0, transcript.get_total_transcript_duration(), dt)
+    speakers = [i for i in transcript.speakers.values() if i.get_interventions_number() > 10]
+    fig, axs = plt.subplots(nrows=len(speakers), sharex=True, figsize=(12, len(speakers) * 0.5))
+    fig.suptitle(transcript.filename)
+    colors = sns.color_palette("pastel", len(speakers))
+    for i, speaker in enumerate(speakers):
+        x = np.zeros(len(t))
+        for intervention in speaker.interventions:
+            start = math.floor(intervention.start_time_ms / 1000)
+            end = math.floor(intervention.end_time_ms / 1000)
+            x[start:end] = 1
+
+        ax = axs[i]
+
+        # Create discrete blocks (bars) for speech segments, hide the continuous line at y=0
+        ax.fill_between(t, 0, x, color=colors[i], step="pre", alpha=0.9, where=(x > 0))
+
+        # Hide y-axis and set title
+        ax.axes.get_yaxis().set_visible(False)
+        ax.set_title(speaker.name, fontsize=8, loc="left", pad=0)
+
+        # Set the x-limits to match the total duration of the transcript
+        ax.set_xlim(0, t[-1])
+        ax.set_ylim(0, .1)
+        def format_time(x, pos):
+            return str(datetime.timedelta(seconds=int(x)))
+        ax.xaxis.set_major_formatter(FuncFormatter(format_time))
+        ax.xaxis.set_major_locator(MultipleLocator(60 * 10))
+        # Rotate tickets
+
+    plt.xticks(fontsize=8)
+    # plt.tight_layout()
+    plt.subplots_adjust(hspace=1)
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -142,5 +224,8 @@ if __name__ == "__main__":
             root = tree.getroot()
             transcript = Transcript(root, file)
             transcript.parse_transcript()
+            
+            # draw_pie_chart(transcript)
+            draw_speakers_timeline_chart(transcript)
 
             print(transcript)

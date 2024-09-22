@@ -5,4 +5,4 @@
 - [x] Number of words per speaker (total)
 - [x] Words/minute
 - [x] Handle multiple speakers (Who parts)
-- [ ] Visualization of the data
+- [x] Visualization of the data
