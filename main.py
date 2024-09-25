@@ -209,7 +209,7 @@ def draw_speakers_timeline_chart(transcript: Transcript, save=False) -> None:  #
     plt.subplots_adjust(hspace=1)
 
     if save:
-        plt.savefig(f"charts/{transcript.filename}.png")
+        plt.savefig(f"charts/{transcript.filename}.png", dpi=300, bbox_inches="tight")
     else:
         plt.show()
 
