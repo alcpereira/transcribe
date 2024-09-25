@@ -25,7 +25,7 @@ class Transcript:
         self.start = 0.0
         self.end = 0.0
 
-    def __repr__(self): # pragma: no cover
+    def __repr__(self):  # pragma: no cover
         decoration = "*" * 10 + "\n"
         speaker_decoration = "-" * 5 + "\n"
         output = decoration
@@ -161,7 +161,7 @@ def clean_speaker_name(name: str, id: str) -> str:
     return name
 
 
-def draw_pie_chart(transcript: Transcript) -> None: # pragma: no cover
+def draw_pie_chart(transcript: Transcript) -> None:  # pragma: no cover
     labels = ["Silence"]
     sizes = [transcript.silence.get_total_duration()]
     for speaker in transcript.speakers.values():
@@ -176,7 +176,7 @@ def draw_pie_chart(transcript: Transcript) -> None: # pragma: no cover
     plt.show()
 
 
-def draw_speakers_timeline_chart(transcript: Transcript) -> None: # pragma: no cover
+def draw_speakers_timeline_chart(transcript: Transcript) -> None:  # pragma: no cover
     dt = 1
     t = np.arange(0.0, transcript.get_total_transcript_duration(), dt)
     speakers = [i for i in transcript.speakers.values() if i.get_interventions_number() > 10]
@@ -192,24 +192,19 @@ def draw_speakers_timeline_chart(transcript: Transcript) -> None: # pragma: no c
 
         ax = axs[i]
 
-        # Create discrete blocks (bars) for speech segments, hide the continuous line at y=0
+        ax.set_title(speaker.name, fontsize=8, loc="left", pad=0)
         ax.fill_between(t, 0, x, color=colors[i], step="pre", alpha=0.9, where=(x > 0))
 
-        # Hide y-axis and set title
-        ax.axes.get_yaxis().set_visible(False)
-        ax.set_title(speaker.name, fontsize=8, loc="left", pad=0)
-
-        # Set the x-limits to match the total duration of the transcript
+        # X axis
         ax.set_xlim(0, t[-1])
-        ax.set_ylim(0, .1)
-        def format_time(x, pos):
-            return str(datetime.timedelta(seconds=int(x)))
-        ax.xaxis.set_major_formatter(FuncFormatter(format_time))
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: str(datetime.timedelta(seconds=int(x)))))
         ax.xaxis.set_major_locator(MultipleLocator(60 * 10))
-        # Rotate tickets
+
+        # Y axis
+        ax.axes.get_yaxis().set_visible(False)
+        ax.set_ylim(0, 0.1)
 
     plt.xticks(fontsize=8)
-    # plt.tight_layout()
     plt.subplots_adjust(hspace=1)
     plt.show()
 
@@ -224,7 +219,7 @@ if __name__ == "__main__":
             root = tree.getroot()
             transcript = Transcript(root, file)
             transcript.parse_transcript()
-            
+
             # draw_pie_chart(transcript)
             draw_speakers_timeline_chart(transcript)
 
