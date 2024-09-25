@@ -9,6 +9,7 @@ from matplotlib.ticker import FuncFormatter, MultipleLocator
 import numpy as np
 import seaborn as sns
 import datetime
+import argparse
 
 
 REGEX_WHO = re.compile(r'<Who nb="(\d)+"\s?\/>(.*)', re.DOTALL)
@@ -176,7 +177,7 @@ def draw_pie_chart(transcript: Transcript) -> None:  # pragma: no cover
     plt.show()
 
 
-def draw_speakers_timeline_chart(transcript: Transcript) -> None:  # pragma: no cover
+def draw_speakers_timeline_chart(transcript: Transcript, save=False) -> None:  # pragma: no cover
     dt = 1
     t = np.arange(0.0, transcript.get_total_transcript_duration(), dt)
     speakers = [i for i in transcript.speakers.values() if i.get_interventions_number() > 10]
@@ -206,12 +207,22 @@ def draw_speakers_timeline_chart(transcript: Transcript) -> None:  # pragma: no 
 
     plt.xticks(fontsize=8)
     plt.subplots_adjust(hspace=1)
-    plt.show()
+
+    if save:
+        plt.savefig(f"charts/{transcript.filename}.png")
+    else:
+        plt.show()
 
 
 if __name__ == "__main__":
     data_folder = os.path.join(os.path.dirname(__file__), "data")
     files = [f for f in os.listdir(data_folder) if f.endswith(".trico") or f.endswith(".trs")]
+
+    parser = argparse.ArgumentParser(description="Process transcript files.")
+    parser.add_argument("--draw-timeline", action="store_true", help="Draw speakers timeline chart")
+    parser.add_argument("--save-timeline", action="store_true", help="Save speakers timeline chart")
+    parser.add_argument("--draw-piechart", action="store_true", help="Draw speakers piechart")
+    args = parser.parse_args()
 
     for file in files:
         with open(os.path.join(data_folder, file), "r", encoding=ENCODING) as f:
@@ -220,7 +231,11 @@ if __name__ == "__main__":
             transcript = Transcript(root, file)
             transcript.parse_transcript()
 
-            # draw_pie_chart(transcript)
-            draw_speakers_timeline_chart(transcript)
-
             print(transcript)
+
+            if args.draw_timeline:
+                draw_speakers_timeline_chart(transcript)
+            if args.save_timeline:
+                draw_speakers_timeline_chart(transcript, save=True)
+            if args.draw_piechart:
+                draw_pie_chart(transcript)

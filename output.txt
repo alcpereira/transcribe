@@ -1,0 +1,248 @@
+**********
+Transcript: 2015_Angleterre-Australie.trico
+Speakers: 6 speakers
+-----
+speaker#1 (spk1) - 963 interventions
+Total duration: 2685.16 seconds
+Total words: 5574
+Words per minute: 124.55
+-----
+speaker#2 (spk2) - 828 interventions
+Total duration: 2096.93 seconds
+Total words: 6030
+Words per minute: 172.54
+-----
+speaker#3 (spk3) - 188 interventions
+Total duration: 552.15 seconds
+Total words: 1240
+Words per minute: 134.75
+-----
+speaker#4 (spk4) - 18 interventions
+Total duration: 93.27 seconds
+Total words: 258
+Words per minute: 165.97
+-----
+speaker#5 (spk5) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+speaker#6 (spk6) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+Silence: 961 interventions total duration: 2258.971 seconds
+Total transcript duration: 6666.36 seconds
+**********
+
+**********
+Transcript: 2015_AfriqueDuSud_Argentine.trico
+Speakers: 6 speakers
+-----
+Christian Jean-Pierre (spk1) - 1101 interventions
+Total duration: 1980.79 seconds
+Total words: 6174
+Words per minute: 187.02
+-----
+Bernard Laporte (spk2) - 1063 interventions
+Total duration: 2066.90 seconds
+Total words: 6572
+Words per minute: 190.78
+-----
+speaker#3 (spk3) - 135 interventions
+Total duration: 319.36 seconds
+Total words: 946
+Words per minute: 177.73
+-----
+speaker#4 (spk4) - 177 interventions
+Total duration: 277.70 seconds
+Total words: 664
+Words per minute: 143.47
+-----
+speaker#5 (spk5) - 12 interventions
+Total duration: 63.29 seconds
+Total words: 161
+Words per minute: 152.64
+-----
+speaker#6 (spk6) - 7 interventions
+Total duration: 13.68 seconds
+Total words: 51
+Words per minute: 223.62
+-----
+Silence: 1556 interventions total duration: 3682.723 seconds
+Total transcript duration: 7687.15 seconds
+**********
+
+**********
+Transcript: 2015_France_Canada TRS.trs
+Speakers: 7 speakers
+-----
+Bernard Laporte (spk1) - 1164 interventions
+Total duration: 1821.66 seconds
+Total words: 7696
+Words per minute: 253.48
+-----
+Christian Jeanpierre (spk2) - 1544 interventions
+Total duration: 2123.53 seconds
+Total words: 7725
+Words per minute: 218.27
+-----
+Christian Califano (spk3) - 174 interventions
+Total duration: 313.58 seconds
+Total words: 1322
+Words per minute: 252.95
+-----
+Arbitre (spk4) - 1 interventions
+Total duration: 0.96 seconds
+Total words: 1
+Words per minute: 62.24
+-----
+Philipe Saint-AndrÃ© (spk5) - 5 interventions
+Total duration: 21.75 seconds
+Total words: 102
+Words per minute: 281.37
+-----
+$ (spk6) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+speaker#7 (spk7) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+Silence: 2030 interventions total duration: 2735.048 seconds
+Total transcript duration: 6605.23 seconds
+**********
+
+**********
+Transcript: 2015_France_Canada Trico.trico
+Speakers: 7 speakers
+-----
+Bernard Laporte (spk1) - 1155 interventions
+Total duration: 1809.51 seconds
+Total words: 7638
+Words per minute: 253.26
+-----
+Christian Jeanpierre (spk2) - 1535 interventions
+Total duration: 2106.81 seconds
+Total words: 7687
+Words per minute: 218.92
+-----
+Christian Califano (spk3) - 180 interventions
+Total duration: 319.39 seconds
+Total words: 1349
+Words per minute: 253.42
+-----
+Arbitre (spk4) - 1 interventions
+Total duration: 0.96 seconds
+Total words: 1
+Words per minute: 62.24
+-----
+Philipe Saint-AndrÃ© (spk5) - 5 interventions
+Total duration: 21.75 seconds
+Total words: 100
+Words per minute: 275.85
+-----
+$ (spk6) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+speaker#7 (spk7) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+Silence: 2035 interventions total duration: 2738.25 seconds
+Total transcript duration: 6605.23 seconds
+**********
+
+**********
+Transcript: 2015_NouvelleZélande-France.trico
+Speakers: 10 speakers
+-----
+Christian Jeanpierre (spk1) - 1435 interventions
+Total duration: 1938.40 seconds
+Total words: 7519
+Words per minute: 232.74
+-----
+Bernard Laporte (spk2) - 1142 interventions
+Total duration: 1945.25 seconds
+Total words: 10450
+Words per minute: 322.32
+-----
+NoSpeaker (spk3) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+Christian Califano (spk4) - 98 interventions
+Total duration: 205.22 seconds
+Total words: 1097
+Words per minute: 320.73
+-----
+Unidentified (spk5) - 1 interventions
+Total duration: 0.87 seconds
+Total words: 1
+Words per minute: 68.65
+-----
+Nigel Owens (spk6) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+a (spk7) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+Philippe Saint-AndrÃ¯Â¿Â½ (spk8) - 3 interventions
+Total duration: 13.13 seconds
+Total words: 84
+Words per minute: 383.85
+-----
+$ (spk9) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+Thierry Dusautoir (spk10) - 20 interventions
+Total duration: 63.42 seconds
+Total words: 316
+Words per minute: 298.94
+-----
+Silence: 1872 interventions total duration: 2734.674 seconds
+Total transcript duration: 6502.27 seconds
+**********
+
+**********
+Transcript: 2007_France_Argentine.trs
+Speakers: 4 speakers
+-----
+speaker#1 (spk1) - 1606 interventions
+Total duration: 2445.03 seconds
+Total words: 8643
+Words per minute: 212.10
+-----
+speaker#2 (spk2) - 960 interventions
+Total duration: 1535.11 seconds
+Total words: 8224
+Words per minute: 321.44
+-----
+speaker#3 (spk3) - 117 interventions
+Total duration: 228.29 seconds
+Total words: 1138
+Words per minute: 299.10
+-----
+speaker#4 (spk4) - 0 interventions
+Total duration: 0.00 seconds
+Total words: 0
+Words per minute: 0.00
+-----
+Silence: 2112 interventions total duration: 2432.144 seconds
+Total transcript duration: 6501.40 seconds
+**********
+

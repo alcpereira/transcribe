@@ -18,6 +18,22 @@ To run the project:
 python main.py
 ```
 
+For example to save the console output into the file `output.txt`, run:
+
+```sh
+python main.py > output.txt
+```
+
+## Charts
+
+To display or save the charts on your local machine you can use:
+
+```sh
+python main.py --draw-timeline # to show the timeline charts
+python main.py --save-timeline # to save the timeline charts
+python main.py --draw-piechart # to show the pie charts
+```
+
 ## How to run the tests
 
 ```sh
